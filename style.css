@@ -1,0 +1,42 @@
+/* BASIC */
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+}
+
+/* GAME GRID */
+#game-grid {
+  width: 200px;
+  height: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: yellow;
+}
+
+#game-grid div {
+  width: 20px;
+  height: 20px;
+}
+
+/* PREVIW GRID */
+#preview-grid {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: yellow;
+  margin-left: 50px;
+}
+
+/* TETROMINOES */
+#game-grid .tetromino {
+  background-color: red;
+}
