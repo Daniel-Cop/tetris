@@ -26,7 +26,7 @@ body {
   height: 20px;
 }
 
-/* PREVIW GRID */
+/* PREVIEW GRID */
 #preview-grid {
   width: 80px;
   height: 80px;
@@ -34,6 +34,15 @@ body {
   flex-wrap: wrap;
   background-color: yellow;
   margin-left: 50px;
+}
+
+#preview-grid div {
+  width: 20px;
+  height: 20px;
+}
+
+#preview-grid .tetromino {
+  background-color: red;
 }
 
 /* TETROMINOES */

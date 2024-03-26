@@ -3,10 +3,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const grid = document.querySelector("#game-grid");
   let squares = Array.from(document.querySelectorAll("#game-grid div"));
   const scoreDisplay = document.querySelector("#score");
+  const startBtn = document.querySelector("#start-button");
   const gridWidth = 10;
 
+  let timerId;
+
+  const previewSquares = document.querySelectorAll("#preview-grid div");
+  const previewWidth = 4;
+  const previewIndex = 0;
+
+  let nextRandom = 0;
+
+  let score = 0;
   let currentPosition = 4;
   let currentRotation = 0;
+
+  const colors = ["orange", "red", "purple", "green", "blue"];
+
+  //TETROMINOS IN PREVIEW
+  const upNextTetrominoes = [
+    [1, previewWidth + 1, previewWidth * 2 + 1, 2], //l
+    [
+      previewWidth * 2,
+      previewWidth * 2 + 1,
+      previewWidth + 1,
+      previewWidth + 2,
+    ], // z
+    [1, previewWidth, previewWidth + 1, previewWidth + 2], //t
+    [0, 1, previewWidth, previewWidth + 1], //o
+    [1, previewWidth + 1, previewWidth * 2 + 1, previewWidth * 3 + 1], //i
+  ];
 
   // TETROMINOES
   const lTetrominoes = [
@@ -73,12 +99,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function draw() {
     current.forEach((index) => {
       squares[currentPosition + index].classList.add("tetromino");
+      squares[currentPosition + index].style.backgroundColor =
+        colors[randomTetromino];
     });
   } //draw tetromino in the game grid
 
   function undraw() {
     current.forEach((index) => {
       squares[currentPosition + index].classList.remove("tetromino");
+      squares[currentPosition + index].style.backgroundColor = "";
     });
   } //undraw the tetromino
 
@@ -91,10 +120,15 @@ document.addEventListener("DOMContentLoaded", () => {
       current.forEach((index) =>
         squares[currentPosition + index].classList.add("taken")
       );
-      randomTetromino = Math.floor(Math.random() * theTetrominoes.length);
+      randomTetromino = nextRandom;
+      nextRandom = Math.floor(Math.random() * theTetrominoes.length);
       current = theTetrominoes[randomTetromino][currentRotation];
       currentPosition = 4;
       draw();
+      nextRandom = Math.floor(Math.random() * theTetrominoes.length);
+      displayShape();
+      addScore();
+      freeze();
     }
   } // stops the falling when touching a taken piece (or the ground) then start another loop
 
@@ -146,6 +180,69 @@ document.addEventListener("DOMContentLoaded", () => {
     current = theTetrominoes[randomTetromino][currentRotation];
     draw();
   } // rotate the tetramino changing it in his next rotation in his array
+
+  function displayShape() {
+    previewSquares.forEach((square) => {
+      square.classList.remove("tetromino");
+      square.style.backgroundColor = "";
+    });
+    upNextTetrominoes[nextRandom].forEach((index) => {
+      previewSquares[previewIndex + index].classList.add("tetromino");
+      previewSquares[previewIndex + index].style.backgroundColor =
+        colors[nextRandom];
+    });
+  } // display the next tetraminoes in the previw grid
+
+  function addScore() {
+    for (let i = 0; i < 199; i += gridWidth) {
+      const row = [
+        i,
+        i + 1,
+        i + 2,
+        i + 3,
+        i + 4,
+        i + 5,
+        i + 6,
+        i + 7,
+        i + 8,
+        i + 9,
+      ];
+      if (row.every((index) => [index].classList.contains("taken"))) {
+        score += 10;
+        scoreDisplay.innerHTML = score;
+        row.forEach((index) => {
+          squares[index].classList.remove("taken");
+          squares[index].classList.remove("tetromino");
+          squares[index].style.backgroundColor = "";
+        });
+        const squaresRemoved = square.splice(i, gridWidth);
+        squares = squaresRemoved.concat(squares);
+        squares.forEach((cell) => grid.appendChild(cell));
+      }
+    }
+  } // delete compelted row and add to score
+
+  function gameOver() {
+    if (
+      current.some((index) =>
+        squares[currentPosition + index].classList.contains("taken")
+      )
+    ) {
+      scoreDisplay.innerHTML = "end";
+      clearInterval(timerId);
+    }
+  }
+
+  // EVENTS
+  startBtn.addEventListener("click", () => {
+    if (timerId) {
+      clearInterval(timerId);
+      timerId = null;
+    } else {
+      draw();
+      timerId = setInterval(moveDown, 1000);
+      displayShape();
+    }
+  });
 });
 //https://www.youtube.com/watch?v=rAUn1Lom6dw
-// minutaggio: 1h 8m 57s
